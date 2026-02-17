@@ -1,0 +1,95 @@
+<h1 class="mb-4" style="font-size: 2.5rem; font-weight: bold; color: #1f2937;">Published Blogs</h1>
+
+<!-- Search Form -->
+<form method="GET" action="/" class="card mb-4">
+  <div style="display: flex; gap: 1rem;">
+    <input 
+      type="text" 
+      name="search" 
+      placeholder="Search blogs..." 
+      value="<%= typeof search !== 'undefined' ? search : '' %>"
+      style="flex: 1; margin-bottom: 0;"
+    />
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+</form>
+
+<!-- Blog List -->
+<% if (blogs.length === 0) { %>
+  <div class="card text-center" style="padding: 3rem;">
+    <p style="font-size: 1.2rem; color: #6b7280;">
+      <%= typeof search !== 'undefined' && search ? 
+        'No blogs found matching your search.' : 
+        'No blogs published yet. Be the first to create one!' %>
+    </p>
+    <% if (!user) { %>
+      <a href="/signup" class="btn btn-primary mt-3">Get Started</a>
+    <% } %>
+  </div>
+<% } else { %>
+  <% blogs.forEach(blog => { %>
+    <article class="card" style="transition: transform 0.2s, box-shadow 0.2s;">
+      <h2 style="margin-bottom: 0.5rem;">
+        <a href="/blogs/<%= blog._id %>" style="color: #1f2937; text-decoration: none; font-size: 1.5rem; font-weight: 600;">
+          <%= blog.title %>
+        </a>
+      </h2>
+
+      <div style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">
+        <span>By <strong><%= blog.author.first_name %> <%= blog.author.last_name %></strong></span>
+        <span style="margin: 0 0.5rem;">•</span>
+        <span><%= blog.reading_time %> min read</span>
+        <span style="margin: 0 0.5rem;">•</span>
+        <span><%= blog.read_count %> reads</span>
+      </div>
+
+      <% if (blog.description) { %>
+        <p style="color: #4b5563; margin-bottom: 1rem; line-height: 1.6;">
+          <%= blog.description %>
+        </p>
+      <% } %>
+
+      <% if (blog.tags && blog.tags.length > 0) { %>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <% blog.tags.forEach(tag => { %>
+            <span style="background: #e5e7eb; color: #374151; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">
+              #<%= tag %>
+            </span>
+          <% }) %>
+        </div>
+      <% } %>
+    </article>
+  <% }) %>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+      <% if (currentPage > 1) { %>
+        <a href="/?page=<%= currentPage - 1 %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %>" 
+           class="btn btn-secondary">
+          ← Previous
+        </a>
+      <% } %>
+
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+          <span class="btn btn-primary" style="cursor: default;"><%= i %></span>
+        <% } else if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) { %>
+          <a href="/?page=<%= i %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %>" 
+             class="btn btn-secondary">
+            <%= i %>
+          </a>
+        <% } else if (i === currentPage - 2 || i === currentPage + 2) { %>
+          <span style="padding: 0.5rem;">...</span>
+        <% } %>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <a href="/?page=<%= currentPage + 1 %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %>" 
+           class="btn btn-secondary">
+          Next →
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+<% } %>

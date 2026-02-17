@@ -1,0 +1,74 @@
+<div style="max-width: 900px; margin: 0 auto;">
+  <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 2rem; color: #1f2937;">
+    Create New Blog
+  </h1>
+
+  <div class="card" style="padding: 2rem;">
+    <form method="POST" action="/blogs">
+      <div class="form-group">
+        <label for="title">Title *</label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          placeholder="Enter your blog title" 
+          required
+          autofocus
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <input 
+          type="text" 
+          id="description" 
+          name="description" 
+          placeholder="Brief description of your blog (optional)"
+        />
+        <small style="color: #6b7280; font-size: 0.875rem;">
+          This will appear in blog previews and search results
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="body">Content *</label>
+        <textarea 
+          id="body" 
+          name="body" 
+          placeholder="Write your blog content here..." 
+          required
+          style="min-height: 400px;"
+        ></textarea>
+        <small style="color: #6b7280; font-size: 0.875rem;">
+          Minimum 20 characters required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="tags">Tags</label>
+        <input 
+          type="text" 
+          id="tags" 
+          name="tags" 
+          placeholder="javascript, nodejs, tutorial"
+        />
+        <small style="color: #6b7280; font-size: 0.875rem;">
+          Separate tags with commas. Example: javascript, tutorial, web development
+        </small>
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn btn-primary">
+          Create Blog
+        </button>
+        <a href="/dashboard" class="btn btn-secondary">
+          Cancel
+        </a>
+      </div>
+
+      <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem;">
+        * Your blog will be created as a draft. You can publish it later from your dashboard.
+      </p>
+    </form>
+  </div>
+</div>

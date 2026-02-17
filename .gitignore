@@ -1,0 +1,8 @@
+node_modules
+.env
+.env.test
+.env.local
+
+# Don't ignore the examples!
+!.env.example
+!.env.test.example

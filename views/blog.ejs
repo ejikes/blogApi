@@ -1,0 +1,57 @@
+<div style="max-width: 800px; margin: 0 auto;">
+  <article class="card" style="padding: 2rem;">
+    <!-- Blog Header -->
+    <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937;">
+      <%= blog.title %>
+    </h1>
+
+    <!-- Blog Meta -->
+    <div style="display: flex; align-items: center; gap: 1rem; padding-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; margin-bottom: 2rem;">
+      <div style="flex: 1;">
+        <p style="color: #6b7280; font-size: 0.95rem;">
+          By <strong style="color: #374151;"><%= blog.author.first_name %> <%= blog.author.last_name %></strong>
+        </p>
+        <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;">
+          <%= blog.reading_time %> min read • <%= blog.read_count %> reads
+        </p>
+      </div>
+
+      <!-- Edit button for owner -->
+      <% if (user && user.id === blog.author._id.toString()) { %>
+        <a href="/blogs/<%= blog._id %>/edit" class="btn btn-secondary">
+          Edit Blog
+        </a>
+      <% } %>
+    </div>
+
+    <!-- Tags -->
+    <% if (blog.tags && blog.tags.length > 0) { %>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem;">
+        <% blog.tags.forEach(tag => { %>
+          <span style="background: #dbeafe; color: #1e40af; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">
+            #<%= tag %>
+          </span>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Description -->
+    <% if (blog.description) { %>
+      <p style="font-size: 1.2rem; color: #4b5563; font-style: italic; margin-bottom: 2rem; padding: 1rem; background: #f9fafb; border-left: 4px solid #2563eb; border-radius: 4px;">
+        <%= blog.description %>
+      </p>
+    <% } %>
+
+    <!-- Blog Content -->
+    <div style="line-height: 1.8; font-size: 1.1rem; color: #374151;">
+      <%- blog.body.replace(/\n\n/g, '</p><p style="margin-bottom: 1rem;">').replace(/\n/g, '<br>') %>
+    </div>
+  </article>
+
+  <!-- Back to home -->
+  <div style="margin-top: 2rem;">
+    <a href="/" style="color: #2563eb; text-decoration: none; font-weight: 500;">
+      ← Back to all blogs
+    </a>
+  </div>
+</div>
