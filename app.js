@@ -25,7 +25,11 @@ const app = express();
 // Connect to database
 connectDB();
 
-// MIDDLEWARE
+// IMPORTANT: Trust proxy for Render deployment
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 
 // Body parsing
 app.use(express.json());
@@ -39,12 +43,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "supersecret",
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "lax" : false,
     maxAge: 24 * 60 * 60 * 1000
   }
 }));

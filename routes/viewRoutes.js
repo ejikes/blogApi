@@ -27,6 +27,7 @@ router.get("/", async (req, res, next) => {
       blogs: result.blogs,
       currentPage: result.pagination.page,
       totalPages: result.pagination.pages,
+      search: req.query.search
     });
   } catch (error) {
     next(error);
@@ -164,58 +165,101 @@ router.get("/dashboard", requireLogin, async (req, res, next) => {
 
 // SIGNUP
 router.get("/signup", (req, res) => {
-  res.render("auth/signup");
+  res.render("auth/signup", { error: null });
 });
 
 router.post("/signup", validate(signupSchema), async (req, res, next) => {
   try {
+    console.log('Signup attempt for:', req.body.email);
+    
     const result = await authService.signup(req.body);
     
+    console.log('Signup service successful');
+    
+    // Set session
     req.session.user = {
       id: result.user.id,
       first_name: result.user.first_name,
     };
     
-    res.redirect("/");
+    // CRITICAL: Save session before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.render("auth/signup", { 
+          error: "Signup successful but session error. Please try login." 
+        });
+      }
+      console.log('Session saved successfully, redirecting to home');
+      res.redirect("/");
+    });
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Signup error:', error.message);
     if (error.statusCode === 400) {
       return res.render("auth/signup", { 
-        error: error.message || "Email already registered" 
+        error: "Email already registered. Please login instead." 
       });
     }
-    next(error);
+    res.render("auth/signup", { 
+      error: "Signup failed. Please try again." 
+    });
   }
 });
 
 // LOGIN
 router.get("/login", (req, res) => {
-  res.render("auth/login");
+  res.render("auth/login", { error: null });
 });
 
 router.post("/login", validate(loginSchema), async (req, res, next) => {
   try {
     const { email } = req.body;
     
+    console.log('Login attempt for:', email);
+    
     await authService.login(req.body);
+    
+    console.log('Login service successful');
 
     const User = require("../models/users");
     const user = await User.findOne({ email });
+    
+    if (!user) {
+      console.error('User not found after successful login');
+      return res.render("auth/login", { 
+        error: "Login error. Please try again." 
+      });
+    }
+    
+    console.log('User found:', user.email);
 
+    // Set session
     req.session.user = {
-      id: user._id,
+      id: user._id.toString(),
       first_name: user.first_name,
     };
-
-    res.redirect("/");
+    
+    // CRITICAL: Save session before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.render("auth/login", { 
+          error: "Login successful but session error. Please try again." 
+        });
+      }
+      console.log('Session saved successfully, redirecting to home');
+      res.redirect("/");
+    });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error:', error.message);
     if (error.statusCode === 401) {
       return res.render("auth/login", { 
         error: "Invalid email or password" 
       });
     }
-    next(error);
+    res.render("auth/login", { 
+      error: "Login failed. Please try again." 
+    });
   }
 });
 
