@@ -169,21 +169,20 @@ router.get("/signup", (req, res) => {
 
 router.post("/signup", validate(signupSchema), async (req, res, next) => {
   try {
-    // Signup using service
     const result = await authService.signup(req.body);
-
-    // Set session
+    
     req.session.user = {
       id: result.user.id,
       first_name: result.user.first_name,
     };
-
+    
     res.redirect("/");
   } catch (error) {
-    // Handle specific errors
+    console.error('Signup error:', error);
     if (error.statusCode === 400) {
-      // Email already exists - redirect back to signup
-      return res.redirect("/signup");
+      return res.render("auth/signup", { 
+        error: error.message || "Email already registered" 
+      });
     }
     next(error);
   }
@@ -196,17 +195,13 @@ router.get("/login", (req, res) => {
 
 router.post("/login", validate(loginSchema), async (req, res, next) => {
   try {
-    // Login using service - returns token but we need user for session
     const { email } = req.body;
     
-    // Authenticate
     await authService.login(req.body);
 
-    // Get user by email for session (we don't have userId yet)
     const User = require("../models/users");
     const user = await User.findOne({ email });
 
-    // Set session
     req.session.user = {
       id: user._id,
       first_name: user.first_name,
@@ -214,10 +209,11 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 
     res.redirect("/");
   } catch (error) {
-    // Handle authentication errors
+    console.error('Login error:', error);
     if (error.statusCode === 401) {
-      // Invalid credentials - redirect back to login
-      return res.redirect("/login");
+      return res.render("auth/login", { 
+        error: "Invalid email or password" 
+      });
     }
     next(error);
   }
